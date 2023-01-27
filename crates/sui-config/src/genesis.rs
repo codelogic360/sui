@@ -790,7 +790,7 @@ fn create_genesis_transaction(
 
         let transaction_data = genesis_transaction.data().intent_message.value.clone();
         let signer = transaction_data.signer();
-        let gas = transaction_data.gas();
+        let gas = transaction_data.gas().to_vec();
         let (inner_temp_store, effects, _execution_error) =
             sui_adapter::execution_engine::execute_transaction_to_effects::<
                 execution_mode::Normal,
@@ -800,7 +800,7 @@ fn create_genesis_transaction(
                 temporary_store,
                 transaction_data.kind,
                 signer,
-                gas,
+                &gas,
                 *genesis_transaction.digest(),
                 Default::default(),
                 &move_vm,
@@ -1120,7 +1120,7 @@ mod test {
 
         let transaction_data = genesis_transaction.data().intent_message.value.clone();
         let signer = transaction_data.signer();
-        let gas = transaction_data.gas();
+        let gas = transaction_data.gas().to_vec();
         let (_inner_temp_store, effects, _execution_error) =
             sui_adapter::execution_engine::execute_transaction_to_effects::<
                 execution_mode::Normal,
@@ -1130,7 +1130,7 @@ mod test {
                 temporary_store,
                 transaction_data.kind,
                 signer,
-                gas,
+                &gas,
                 *genesis_transaction.digest(),
                 Default::default(),
                 &move_vm,
