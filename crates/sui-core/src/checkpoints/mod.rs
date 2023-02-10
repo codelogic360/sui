@@ -606,6 +606,13 @@ impl CheckpointBuilder {
 
             let epoch_rolling_gas_cost_summary =
                 self.get_epoch_total_gas_cost(last_checkpoint.as_ref().map(|(_, c)| c), &effects);
+
+            self.accumulator.accumulate_checkpoint(
+                effects.clone(),
+                sequence_number,
+                self.epoch_store.clone(),
+            )?;
+
             if last_checkpoint_of_epoch {
                 self.augment_epoch_last_checkpoint(
                     &epoch_rolling_gas_cost_summary,
@@ -613,26 +620,16 @@ impl CheckpointBuilder {
                     &mut effects,
                 )
                 .await?;
+
+                let root_state_digest = Some(
+                    self.accumulator
+                        .digest_epoch(&epoch, sequence_number, self.epoch_store.clone())
+                        .await?,
+                );
+
+                // for now, just log this value, and insert None into the checkpoint summary
+                info!("Epoch {epoch} root state hash digest: {root_state_digest:?}");
             }
-
-            let root_state_digest = if last_checkpoint_of_epoch {
-                self.accumulator.accumulate_checkpoint(
-                    effects.clone(),
-                    sequence_number,
-                    self.epoch_store.clone(),
-                )?;
-
-                Some(self.accumulator.digest_epoch(
-                    &epoch,
-                    sequence_number,
-                    self.epoch_store.clone(),
-                )?)
-            } else {
-                None
-            };
-
-            // for now, just log this value, and insert None into the checkpoint summary
-            info!("Epoch {epoch} root state hash digest: {root_state_digest:?}");
 
             let contents =
                 CheckpointContents::new_with_causally_ordered_transactions_and_signatures(

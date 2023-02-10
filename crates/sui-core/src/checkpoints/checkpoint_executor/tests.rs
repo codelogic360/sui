@@ -114,7 +114,8 @@ pub async fn test_checkpoint_executor_cross_epoch() {
         CommitteeFixture,
     ) = init_executor_test(buffer_size, checkpoint_store.clone()).await;
 
-    let epoch = authority_state.epoch();
+    let epoch_store = authority_state.epoch_store_for_testing();
+    let epoch = epoch_store.epoch();
     assert_eq!(epoch, 0);
 
     assert!(matches!(
@@ -170,9 +171,7 @@ pub async fn test_checkpoint_executor_cross_epoch() {
 
     // Ensure executor reaches end of epoch in a timely manner
     timeout(Duration::from_secs(5), async {
-        executor
-            .run_epoch(authority_state.epoch_store_for_testing().clone())
-            .await;
+        executor.run_epoch(epoch_store.clone()).await;
     })
     .await
     .unwrap();
@@ -183,8 +182,9 @@ pub async fn test_checkpoint_executor_cross_epoch() {
         .digest_epoch(
             &first_epoch,
             end_of_epoch_0_checkpoint.sequence_number(),
-            authority_state.epoch_store().clone(),
+            epoch_store.clone(),
         )
+        .await
         .unwrap();
 
     // We should have synced up to epoch boundary
@@ -205,14 +205,16 @@ pub async fn test_checkpoint_executor_cross_epoch() {
         .unwrap());
 
     authority_state
-        .reconfigure(second_committee.committee().clone(), 0)
+        .reconfigure(&epoch_store, second_committee.committee().clone(), 0)
         .await
         .unwrap();
+
+    let new_epoch_store = authority_state.epoch_store_for_testing();
 
     // checkpoint execution should resume starting at checkpoints
     // of next epoch
     timeout(Duration::from_secs(5), async {
-        executor.run_epoch(new_epoch_store).await;
+        executor.run_epoch(new_epoch_store.clone()).await;
     })
     .await
     .unwrap();
@@ -226,14 +228,15 @@ pub async fn test_checkpoint_executor_cross_epoch() {
     );
 
     let second_epoch = 1;
-    assert!(second_epoch == authority_state.epoch());
+    assert!(second_epoch == new_epoch_store.epoch());
 
     accumulator
         .digest_epoch(
             &second_epoch,
             end_of_epoch_1_checkpoint.sequence_number(),
-            authority_state.epoch_store().clone(),
+            new_epoch_store.clone(),
         )
+        .await
         .unwrap();
 
     assert!(authority_state

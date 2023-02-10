@@ -49,10 +49,8 @@ use tokio_stream::StreamExt;
 use tracing::{debug, error, info, instrument, warn};
 use typed_store::Map;
 
+use crate::authority::authority_per_epoch_store::AuthorityPerEpochStore;
 use crate::authority::AuthorityStore;
-use crate::authority::{
-    authority_per_epoch_store::AuthorityPerEpochStore, authority_store::EffectsStore,
-};
 use crate::state_accumulator::StateAccumulator;
 use crate::transaction_manager::TransactionManager;
 use crate::{authority::EffectsNotifyRead, checkpoints::CheckpointStore};
@@ -320,7 +318,7 @@ impl CheckpointExecutor {
                     checkpoint.clone(),
                     authority_store.clone(),
                     checkpoint_store.clone(),
-                    &epoch_store,
+                    epoch_store.clone(),
                     tx_manager.clone(),
                     accumulator.clone(),
                     local_execution_timeout_sec,
@@ -432,7 +430,6 @@ async fn execute_transactions(
     checkpoint: VerifiedCheckpoint,
     accumulator: Arc<StateAccumulator>,
 ) -> Result<CheckpointExecutionState, SuiError> {
-    let checkpoint_sequence = checkpoint.sequence_number();
     let all_tx_digests: Vec<TransactionDigest> =
         execution_digests.iter().map(|tx| tx.transaction).collect();
 
@@ -487,21 +484,21 @@ async fn execute_transactions(
 
         match timeout(log_timeout_sec, effects_future).await {
             Err(_elapsed) => {
-                let missing_digests: Vec<TransactionDigest> =
-                    EffectsStore::get_effects(&authority_store, all_tx_digests.clone().iter())
-                        .expect("Failed to get effects")
-                        .iter()
-                        .zip(all_tx_digests.clone())
-                        .filter_map(
-                            |(fx, digest)| {
-                                if fx.is_none() {
-                                    Some(digest)
-                                } else {
-                                    None
-                                }
-                            },
-                        )
-                        .collect();
+                let missing_digests: Vec<TransactionDigest> = authority_store
+                    .get_effects(&all_tx_digests)
+                    .expect("Failed to get effects")
+                    .iter()
+                    .zip(all_tx_digests.clone())
+                    .filter_map(
+                        |(fx, digest)| {
+                            if fx.is_none() {
+                                Some(digest)
+                            } else {
+                                None
+                            }
+                        },
+                    )
+                    .collect();
 
                 warn!(
                     "Transaction effects for tx digests {:?} checkpoint not present within {:?}. ",
@@ -528,9 +525,13 @@ async fn execute_transactions(
                 )?;
 
                 let effects: Vec<TransactionEffects> =
-                    effects.into_iter().map(|fx| fx.data().clone()).collect();
+                    effects.iter().map(|fx| fx.data().clone()).collect();
 
-                accumulator.accumulate_checkpoint(effects, checkpoint_sequence, epoch_store)?;
+                accumulator.accumulate_checkpoint(
+                    effects.clone(),
+                    checkpoint_sequence,
+                    epoch_store,
+                )?;
 
                 let execution_state = CheckpointExecutionState {
                     effects,
