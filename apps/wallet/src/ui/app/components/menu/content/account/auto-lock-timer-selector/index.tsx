@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Field, Formik, Form } from 'formik';
-import { useEffect, useState } from 'react';
-import Browser from 'webextension-polyfill';
 import * as Yup from 'yup';
 
 import Button from '_app/shared/button';
@@ -13,11 +11,10 @@ import Alert from '_components/alert';
 import Loading from '_components/loading';
 import { useAppDispatch } from '_hooks';
 import {
-    AUTO_LOCK_TIMER_DEFAULT_INTERVAL_MINUTES,
-    AUTO_LOCK_TIMER_STORAGE_KEY,
     AUTO_LOCK_TIMER_MIN_MINUTES,
     AUTO_LOCK_TIMER_MAX_MINUTES,
 } from '_src/shared/constants';
+import { useAutoLockInterval } from '_src/ui/app/hooks/useAutoLockInterval';
 
 import st from './AutoLockTimerSelector.module.scss';
 
@@ -31,22 +28,12 @@ const validation = Yup.object({
 });
 
 export default function AutoLockTimerSelector() {
-    const [timerMinutes, setTimerMinutes] = useState<number | null>(null);
-    useEffect(() => {
-        Browser.storage.local
-            .get({
-                [AUTO_LOCK_TIMER_STORAGE_KEY]:
-                    AUTO_LOCK_TIMER_DEFAULT_INTERVAL_MINUTES,
-            })
-            .then(({ [AUTO_LOCK_TIMER_STORAGE_KEY]: storedTimer }) =>
-                setTimerMinutes(storedTimer)
-            );
-    }, []);
     const dispatch = useAppDispatch();
+    const autoLockInterval = useAutoLockInterval();
     return (
-        <Loading loading={timerMinutes === null}>
+        <Loading loading={autoLockInterval === null}>
             <Formik
-                initialValues={{ timer: timerMinutes }}
+                initialValues={{ timer: autoLockInterval }}
                 validationSchema={validation}
                 onSubmit={async ({ timer }) => {
                     if (timer !== null) {
@@ -58,7 +45,6 @@ export default function AutoLockTimerSelector() {
                             // log it?
                         }
                     }
-                    setTimerMinutes(timer);
                 }}
                 enableReinitialize={true}
             >

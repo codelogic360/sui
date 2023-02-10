@@ -16,17 +16,6 @@ import st from './Account.module.scss';
 
 function Account() {
     const backUrl = useNextMenuUrl(true, '/');
-    const dispatch = useAppDispatch();
-    const [logoutInProgress, setLogoutInProgress] = useState(false);
-    const handleLogout = useCallback(async () => {
-        setLogoutInProgress(true);
-        try {
-            await dispatch(logout());
-            window.location.reload();
-        } finally {
-            setLogoutInProgress(false);
-        }
-    }, [dispatch]);
     return (
         <Layout title="Account" backUrl={backUrl} isSettings>
             <div className={st.content}>
@@ -50,23 +39,6 @@ function Account() {
                     <AutoLockTimerSelector />
                 </div>
             </div>
-            <button
-                className={st.logout}
-                onClick={handleLogout}
-                disabled={logoutInProgress}
-            >
-                {logoutInProgress ? (
-                    <LoadingIndicator />
-                ) : (
-                    <>
-                        <Icon
-                            icon={SuiIcons.Logout}
-                            className={st.logoutIcon}
-                        />
-                        Logout
-                    </>
-                )}
-            </button>
         </Layout>
     );
 }
