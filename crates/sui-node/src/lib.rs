@@ -830,6 +830,11 @@ impl SuiNode {
             .get_sui_system_state_object()
             .expect("Reading Sui system state object cannot fail");
         let new_committee = system_state.get_current_epoch_committee();
+
+        // If we eventually add tests that exercise safe mode, we will need a configurable way of
+        // guarding against unexpected safe_mode.
+        debug_assert!(!system_state.safe_mode);
+
         assert_eq!(next_epoch, new_committee.committee.epoch);
         self.state
             .reconfigure(
