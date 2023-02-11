@@ -29,16 +29,24 @@ function AddressResult() {
     const { id: addressId } = useParams();
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-12 xl:space-y-0">
             <PageHeader type="Address" title={addressId!} />
-            <Heading variant="heading4/semibold">Owned Objects</Heading>
+
             <div>
+                <div className="border-b border-gray-45 pb-5 xl:mt-12">
+                    <Heading variant="heading4/semibold">Owned Objects</Heading>
+                </div>
                 <ErrorBoundary>
                     <OwnedObjects id={addressId!} byAddress />
                 </ErrorBoundary>
-                <Heading variant="heading4/semibold">Transactions</Heading>
+            </div>
+
+            <div>
+                <div className="border-b border-gray-45 pb-5">
+                    <Heading variant="heading4/semibold">Transactions</Heading>
+                </div>
                 <ErrorBoundary>
-                    <div className="mt-6">
+                    <div className="mt-2">
                         <TxForID id={addressId!} category="address" />
                     </div>
                 </ErrorBoundary>
