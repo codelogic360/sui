@@ -36,7 +36,9 @@ export default function OwnedObjectView({ results }: { results: DataType }) {
         <div className="grid w-1/2 grid-cols-1 divide-x-0 divide-gray-45 xl:w-full xl:grid-cols-2 xl:divide-x">
             {coin_results.length > 0 && (
                 <div className="space-y-5 pt-5 pr-0 xl:pr-10">
-                    <Heading variant="heading4/bold">Coins</Heading>
+                    <Heading color="gray-90" variant="heading4/semibold">
+                        Coins
+                    </Heading>
                     <OwnedCoinView results={coin_results} />
                 </div>
             )}
@@ -44,7 +46,9 @@ export default function OwnedObjectView({ results }: { results: DataType }) {
             <div className="pl-0 xl:pl-10">
                 {other_results.length > 0 && (
                     <div className="py-5" data-testid="owned-nfts">
-                        <Heading variant="heading4/bold">NFTs</Heading>
+                        <Heading color="gray-90" variant="heading4/semibold">
+                            NFTs
+                        </Heading>
                     </div>
                 )}
 

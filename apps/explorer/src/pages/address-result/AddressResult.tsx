@@ -34,7 +34,9 @@ function AddressResult() {
 
             <div>
                 <div className="border-b border-gray-45 pb-5 xl:mt-12">
-                    <Heading variant="heading4/semibold">Owned Objects</Heading>
+                    <Heading color="gray-90" variant="heading4/semibold">
+                        Owned Objects
+                    </Heading>
                 </div>
                 <ErrorBoundary>
                     <OwnedObjects id={addressId!} byAddress />
@@ -43,7 +45,9 @@ function AddressResult() {
 
             <div>
                 <div className="border-b border-gray-45 pb-5">
-                    <Heading variant="heading4/semibold">Transactions</Heading>
+                    <Heading color="gray-90" variant="heading4/semibold">
+                        Transactions
+                    </Heading>
                 </div>
                 <ErrorBoundary>
                     <div className="mt-2">

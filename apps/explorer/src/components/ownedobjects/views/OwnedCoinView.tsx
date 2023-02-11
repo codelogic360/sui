@@ -101,7 +101,7 @@ function SingleCoinView({
             </Disclosure.Button>
 
             <Disclosure.Panel>
-                <div className="flex flex-col gap-1 bg-gray-40 p-4">
+                <div className="flex flex-col gap-1 bg-gray-40 p-3">
                     {subObjList.map((subObj) => (
                         <CoinItem
                             key={subObj.id}
