@@ -37,7 +37,7 @@ function CoinItem({
                 Balance
             </Text>
 
-            <div className="col-span-3 inline-flex items-center gap-1">
+            <div className="col-span-3 inline-flex items-end gap-1">
                 <Text color="steel-darker" variant="bodySmall/medium">
                     {formattedBalance}
                 </Text>
@@ -90,9 +90,14 @@ function SingleCoinView({
                     {subObjList.length}
                 </Text>
 
-                <Text color="steel-darker" variant="body/medium">
-                    {formattedTotalBalance}
-                </Text>
+                <div className="flex items-center gap-1">
+                    <Text color="steel-darker" variant="bodySmall/medium">
+                        {formattedTotalBalance}
+                    </Text>
+                    <Text color="steel" variant="subtitleSmallExtra/normal">
+                        {symbol}
+                    </Text>
+                </div>
             </Disclosure.Button>
 
             <Disclosure.Panel>
