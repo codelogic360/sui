@@ -8,6 +8,8 @@ import OwnedNFTView from './OwnedNFTView';
 
 import styles from '../styles/OwnedObjects.module.css';
 
+import { Heading } from '~/ui/Heading';
+
 const viewFn = (results: any) => <OwnedNFTView results={results} />;
 
 export default function OwnedObjectView({ results }: { results: DataType }) {
@@ -35,7 +37,7 @@ export default function OwnedObjectView({ results }: { results: DataType }) {
             {coin_results.length > 0 && (
                 <div>
                     <div className={styles.ownedobjectheader}>
-                        <h2>Coins</h2>
+                        <Heading variant="heading4/bold">Coins</Heading>
                     </div>
                     <OwnedCoinView results={coin_results} />
                 </div>
@@ -43,7 +45,7 @@ export default function OwnedObjectView({ results }: { results: DataType }) {
             {other_results.length > 0 && (
                 <div data-testid="owned-nfts">
                     <div className={styles.ownedobjectheader}>
-                        <h2>NFTs</h2>
+                        <Heading variant="heading4/bold">NFTs</Heading>
                     </div>
                     <PaginationLogic
                         results={other_results}

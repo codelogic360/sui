@@ -8,6 +8,7 @@ import OwnedObjects from '../../components/ownedobjects/OwnedObjects';
 import TxForID from '../../components/transaction-card/TxForID';
 
 import { Banner } from '~/ui/Banner';
+import { Heading } from '~/ui/Heading';
 import { PageHeader } from '~/ui/PageHeader';
 
 type DataType = {
@@ -25,37 +26,25 @@ function instanceOfDataType(object: any): object is DataType {
 }
 
 function AddressResult() {
-    const { id: addressID } = useParams();
+    const { id: addressId } = useParams();
 
-    if (addressID !== undefined) {
-        return (
-            <>
-                <div className="mt-5 mb-10">
-                    <PageHeader type="Address" title={addressID} />
-                </div>
-                <div>
-                    <h1>Owned Objects</h1>
-                    <div>
-                        <ErrorBoundary>
-                            <OwnedObjects id={addressID} byAddress />
-                        </ErrorBoundary>
+    return (
+        <div className="space-y-10">
+            <PageHeader type="Address" title={addressId!} />
+            <Heading variant="heading4/semibold">Owned Objects</Heading>
+            <div>
+                <ErrorBoundary>
+                    <OwnedObjects id={addressId!} byAddress />
+                </ErrorBoundary>
+                <Heading variant="heading4/semibold">Transactions</Heading>
+                <ErrorBoundary>
+                    <div className="mt-6">
+                        <TxForID id={addressId!} category="address" />
                     </div>
-                </div>
-                <div>
-                    <h1>Transactions</h1>
-                    <ErrorBoundary>
-                        <TxForID id={addressID} category="address" />
-                    </ErrorBoundary>
-                </div>
-            </>
-        );
-    } else {
-        return (
-            <Banner variant="error" spacing="lg" fullWidth>
-                Something went wrong
-            </Banner>
-        );
-    }
+                </ErrorBoundary>
+            </div>
+        </div>
+    );
 }
 
 export default AddressResult;
