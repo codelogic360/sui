@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[test_only]
-module sui::test_coin {
+module sui::test_coin_balance {
     use sui::test_scenario::{Self, ctx};
     use sui::pay;
     use sui::coin;
